@@ -20,8 +20,9 @@
 
 /* chart.css starts here*/
 .chart {
-    max-width: 80vw;
+    width: 100%;
     min-height: 450px;
+    overflow: scroll;
 }
 
 .graphContainer {
