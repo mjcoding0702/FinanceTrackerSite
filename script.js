@@ -1,5 +1,3 @@
-//Budget Planner APP
-
 // Form DOM Elements
 const btns = document.querySelectorAll(".btn-group-toggle .btn");
 const addBtn = document.querySelector('.plusButton')
@@ -24,8 +22,46 @@ submitBtn.addEventListener('click', (e) => {
     submitTransaction('submit');
 })
 
+// Edit Button
+let currentEditItem = null;
+transactionContainer.addEventListener('click', (e) => {
+    if (e.target.closest('.editButton')){
+        let transactions = JSON.parse(localStorage.getItem('transactionItem')) || [];
+        const id = e.target.closest('.transaction_item').dataset.id;
+
+        currentEditItem = transactions.find(transaction => transaction.id === id);
+        let transactionType = currentEditItem.transactionType;
+
+        displayModal(transactionType,currentEditItem);
+    }
+})
+
+// Save Button
+saveBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (currentEditItem !== null) {
+        submitTransaction('save', currentEditItem);
+    }
+})
+
+// Delete Button
+transactionContainer.addEventListener('click', (e) => {
+    if (e.target.closest('.deleteButton')){
+        let transactions = JSON.parse(localStorage.getItem('transactionItem')) || [];
+        const id = e.target.closest('.transaction_item').dataset.id;
+        const index = transactions.findIndex(transaction => transaction.id === id);
+
+        transactions.splice(index, 1);
+        localStorage.setItem('transactionItem', JSON.stringify(transactions));
+
+        displayTransactions();
+        displayBalance();
+    }
+})
 
 
+//Functions
+//User submits a transaction
 function submitTransaction(type, transactionItem) {
     let transactions = JSON.parse(localStorage.getItem('transactionItem')) || [];
     // Get all 6 values in form
@@ -133,55 +169,9 @@ function submitTransaction(type, transactionItem) {
         const  modal = document.getElementById("myModal");
         modal.style.display = "none";
     }
-    
-    
 }
 
-let currentEditItem = null;
-
-// Edit Button
-transactionContainer.addEventListener('click', (e) => {
-    if (e.target.closest('.editButton')){
-        let transactions = JSON.parse(localStorage.getItem('transactionItem')) || [];
-        const id = e.target.closest('.transaction_item').dataset.id;
-
-        currentEditItem = transactions.find(transaction => transaction.id === id);
-        let transactionType = currentEditItem.transactionType;
-
-        displayModal(transactionType,currentEditItem);
-    }
-})
-
-// Save Button
-saveBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (currentEditItem !== null) {
-        submitTransaction('save', currentEditItem);
-    }
-})
-
-
-
-// Delete Button
-transactionContainer.addEventListener('click', (e) => {
-    if (e.target.closest('.deleteButton')){
-        let transactions = JSON.parse(localStorage.getItem('transactionItem')) || [];
-        const id = e.target.closest('.transaction_item').dataset.id;
-        const index = transactions.findIndex(transaction => transaction.id === id);
-
-        transactions.splice(index, 1);
-        localStorage.setItem('transactionItem', JSON.stringify(transactions));
-
-        displayTransactions();
-        displayBalance();
-    }
-
-})
-
-
-
-
-//Functions
+//Display Wallet Total Balance
 function displayBalance() {
     let transactions = JSON.parse(localStorage.getItem('transactionItem')) || [];
     let balance = 0;
@@ -211,7 +201,7 @@ function displayBalance() {
     walletBalance.innerText = `${symbol}$${balance}`
 }
 
-
+//Updates the transaction list
 function displayTransactions() {
     //Get all transaction items from the local storage
     let transactions = JSON.parse(localStorage.getItem('transactionItem')) || [];
@@ -303,6 +293,7 @@ function displayTransactions() {
     })
 }
 
+//Unique ID for each transaction
 function uuidv4() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -310,7 +301,7 @@ function uuidv4() {
     });
 }
 
-
+//Show Modal for user to fill up the form
 function displayModal(transactionType, transactionItem) {
     // DOM Elements
     const  modal = document.getElementById("myModal");
